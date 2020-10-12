@@ -330,6 +330,25 @@ def gradient(f, *varargs, **kwargs):
         otype = numpy.double
 
     # TODO: use Elementwisekerne
+    compute_gradient = cp.Elementwisekernel(
+        'T f, raw T axes, raw T dx',
+        'T out',
+        '''
+        T axis = 0;
+        T dx = 0;
+        for(T j = 0, j < axes.length(); j++){
+            axis = axes[i];
+            ax_dx = dx[i];
+            T out = 0;
+            slice1[]
+        }
+
+        '''
+        'compute_gradient'
+    )
+
+    # user raw for indexing,
+    #
     for axis, ax_dx in zip(axes, dx):
         if f.shape[axis] < edge_order + 1:
             raise ValueError(
@@ -340,6 +359,7 @@ def gradient(f, *varargs, **kwargs):
 
         # spacing for the current axis
         uniform_spacing = cnp.ndim(ax_dx) == 0
+
 
         # Numerical differentiation: 2nd order interior
         slice1[axis] = slice(1, -1)
